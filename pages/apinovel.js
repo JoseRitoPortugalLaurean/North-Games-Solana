@@ -1,6 +1,5 @@
 const btn = document.querySelector("#btn");
 const img = document.querySelector("#text");
-const input = document.querySelector("#input");
 
 const NOVELAI_API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Il8zeERtU284SzNadz6Z0";
 // Asegúrate de que NOVELAI_API_KEY contenga tu clave de API

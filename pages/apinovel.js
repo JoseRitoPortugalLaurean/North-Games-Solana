@@ -17,7 +17,5 @@ const NOVELAI_API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Il8zeERtU2
   const data = await res.json();
   console.log(data);
 
-  input.value = "";
-
   img.src = data.data[0].url;
 });

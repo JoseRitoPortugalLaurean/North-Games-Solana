@@ -193,45 +193,34 @@ const Home = () => {
         }
     };
 
-    //Función para subir archivos a IPFS
-
-    const { mutateAsync: upload } = useStorageUpload();
-
-    const uploadToIpfs = async (file) => {
-        setStatusText("Subiendo a IPFS...");
-        const uploadUrl = await upload({
-            data: [file],
-            options: {
-                uploadWithGatewayUrl: true,
-                uploadWithoutDirectory: true,
-            },
+    btn.addEventListener("click", async () => {
+        if (input.value === "") {
+          alert("Please enter a prompt!");
+          return;
+        }
+      
+        btn.disabled = true;
+      
+        const res = await fetch("https://api.openai.com/v1/images/generations", {
+          method: "POST",
+          body: JSON.stringify({
+            prompt: input.value,
+            n: 1,
+            size: "1024x1024",
+          }),
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${OPENAI_API_KEY}`,
+          },
         });
-        return uploadUrl[0];
-    };
-
-    // URL a Blob
-    const urlToBLob = async (file) => {
-        setStatusText("Transformando url...");
-        await fetch(url)
-            .then((res) => res.blob())
-            .then((myBlob) => {
-                // logs: Blob { size: 1024, type: "image/jpeg" }
-
-                myBlob.name = "blob.png";
-
-                file = new File([myBlob], "image.png", {
-                    type: myBlob.type,
-                });
-            });
-
-        const uploadUrl = await uploadToIpfs(file);
-        console.log("uploadUrl", uploadUrl);
-
-        setStatusText(`La url de tu archivo es: ${uploadUrl} `);
-        setUploadUrl(uploadUrl);
-
-        return uploadUrl;
-    };
+        const data = await res.json();
+        console.log(data);
+      
+        input.value = "";
+      
+        img.src = data.data[0].url;
+        btn.disabled = false;})
+    
 
     //Funcion para crear un NFT
     const generateNFT = async () => {
@@ -257,145 +246,5 @@ const Home = () => {
             console.error("ERROR GENERATE NFT", error);
             toast.error("Error al generar el NFT");
         }
-    };
-
-    return (
-        <div className="h-screen bg-black">
-            <div className="flex flex-col  w-auto h-auto  bg-black">
-                <div className="flex flex-col py-24 place-items-center justify-center">
-                    <h1 className="text-5xl font-bold pb-10 text-emerald-300">
-                        Superteach Starter
-                    </h1>
-
-                    {publicKey ? (
-                        <div className="flex flex-col py-24 place-items-center justify-center">
-                            <br />
-
-                            <h1 className="text-2xl font-bold text-white">
-                                Tu numero de Wallet es {publicKey}
-                            </h1>
-
-                            <br />
-
-                            <h1 className="text-2xl font-bold text-white">
-                                Tu balance es {balance} SOL
-                            </h1>
-                            <br />
-                            <h1 className="text-2xl  text-white">
-                                Enviar una transaccion a:
-                            </h1>
-
-                            <input
-                                className="h-8 w-72 mt-4   border-2 border-black "
-                                type="text"
-                                onChange={handleReceiverChange}
-                            />
-                            <br />
-                            <h1 className="text-2xl  text-white">
-                                Cantidad de SOL a enviar:
-                            </h1>
-                            <input
-                                className="h-8 w-72 mt-4   border-2 border-black "
-                                type="text"
-                                onChange={handleAmountChange}
-                            />
-                            <br />
-                            <button
-                                type="submit"
-                                className="inline-flex h-8 w-52 justify-center bg-purple-500 font-bold text-white"
-                                onClick={() => {
-                                    handleSubmit();
-                                }}
-                            >
-                                Enviar ⚡
-                            </button>
-                            <br />
-
-                            <a href={explorerLink}>
-                                <h1 className="text-md font-bold text-sky-500">
-                                    {explorerLink}
-                                </h1>
-                            </a>
-                            <br />
-
-                            <h1 className="text-2xl  text-white">
-                                Url del archivo que quieres subir:
-                            </h1>
-
-                            <input
-                                className="h-8 w-52 mt-4 border-2 border-black"
-                                type="float"
-                                onChange={handleUrlChange}
-                            />
-                            <br />
-                            <button
-                                className="inline-flex h-8 w-52 justify-center bg-purple-500 font-bold text-white"
-                                onClick={() => {
-                                    urlToBLob();
-                                }}
-                            >
-                                Subir archivo a IPFS
-                            </button>
-
-                            <br />
-
-                            <p className="text-white font-bold mb-8">
-                                {statusText}
-                            </p>
-
-                            <br />
-
-                            {uploadUrl ? (
-                                <button
-                                    className="inline-flex h-8 w-52 justify-center bg-purple-500 font-bold text-white"
-                                    onClick={() => {
-                                        generateNFT();
-                                    }}
-                                >
-                                    Crear NFT 🔥
-                                </button>
-                            ) : (
-                                <button
-                                    className="inline-flex h-8 w-auto justify-center bg-red-500 font-bold text-white"
-                                    onClick={() => {
-                                        toast.error(
-                                            "Primero sube una imagen a IPFS"
-                                        );
-                                    }}
-                                >
-                                    Primer sube una imagen a IPFS ⚠
-                                </button>
-                            )}
-
-                            <br />
-                            <button
-                                type="submit"
-                                className="inline-flex h-8 w-52 justify-center bg-purple-500 font-bold text-white"
-                                onClick={() => {
-                                    signOut();
-                                }}
-                            >
-                                Desconecta tu wallet 👻
-                            </button>
-                        </div>
-                    ) : (
-                        <div className="flex flex-col place-items-center justify-center">
-                            <button
-                                type="submit"
-                                className="inline-flex h-8 w-52 justify-center bg-purple-500 font-bold text-white"
-                                onClick={() => {
-                                    signIn();
-                                }}
-                            >
-                                Conecta tu wallet 👻
-                            </button>
-                        </div>
-                    )}
-                </div>
-                <Toaster position="bottom-center" />
-            </div>
-        </div>
-    );
-};
-
-export default Home;
+    }
+}

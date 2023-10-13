@@ -18,4 +18,4 @@ const NOVELAI_API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Il8zeERtU2
   console.log(data);
 
   img.src = data.data[0].url;
-});
+;
